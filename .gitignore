@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Epc.API/bin/Debug/netcoreapp1.1
+/Epc.API/obj
+/Epc.API/obj
+/.vs/Epc.API/v15/.suo
