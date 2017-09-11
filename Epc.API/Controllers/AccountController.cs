@@ -50,7 +50,7 @@ namespace Epc.API.Controllers
 
             if (user.Password == PasswordHelper.HashPassword(credentials.Password))
             {
-                return Ok();
+                return Ok(new { token = "blahblahblah" });
             }
 
             return BadRequest();

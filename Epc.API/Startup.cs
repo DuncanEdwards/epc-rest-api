@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Epc.API.Entities;
 using Epc.API.Services;
+using Epc.API.Security;
 
 namespace Epc.API
 {
@@ -54,6 +55,12 @@ namespace Epc.API
 
             // register the repository
             services.AddScoped<IEpcRepository, EpcRepository>();
+
+            //Required to use options
+            services.AddOptions();
+
+            //Token provider options
+            services.Configure<TokenProviderOptions>(Configuration.GetSection("TokenProvider"));
 
             // Add framework services.
             services.AddMvc();
