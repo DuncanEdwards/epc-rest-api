@@ -1,4 +1,5 @@
 ﻿using Epc.API.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
@@ -26,7 +27,7 @@ namespace Epc.API.Services
 
         public User GetUserByEmailAddress(string email)
         {
-           return  _epcContext.Users.FirstOrDefault(u => (u.Email == email));
+           return  _epcContext.Users.Include("Type").FirstOrDefault(u => (u.Email == email));
         }
 
         #endregion

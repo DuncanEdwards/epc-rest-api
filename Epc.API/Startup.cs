@@ -11,6 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Epc.API.Entities;
 using Epc.API.Services;
 using Epc.API.Security;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using System.Text;
+using Epc.API.Helpers;
 
 namespace Epc.API
 {
@@ -71,13 +75,18 @@ namespace Epc.API
             IApplicationBuilder app, 
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
-            EpcContext epcContext)
+            EpcContext epcContext,
+            IOptions<TokenProviderOptions> tokenProviderOptions)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             //Create test data
             epcContext.EnsureSeedDataForContext();
+
+            //Hook in Jwt Bearer authorization
+            app.UseJwtBearerAuthentication(TokenHelper.GetJwtBearerOptions(tokenProviderOptions.Value));
+
 
             app.UseMvc();
         }

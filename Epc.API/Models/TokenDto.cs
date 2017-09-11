@@ -11,7 +11,7 @@ namespace Epc.API.Models
         public string TokenType { get; set; } = "Bearer";
 
         [JsonProperty(PropertyName = "expires_in")]
-        public int ExpiresIn { get; set; };
+        public int ExpiresIn { get; set; }
     
     }
 }

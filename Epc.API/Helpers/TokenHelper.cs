@@ -1,40 +1,27 @@
 ﻿using Epc.API.Entities;
+using Epc.API.Models;
 using Epc.API.Security;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Epc.API.Helpers
 {
-    public class TokenHelper
+    static public class TokenHelper
     {
-
-        #region Private Fields
-
-        private readonly TokenProviderOptions _tokenProviderOptions;
-
-        #endregion
-
-        #region Public Constructor
-
-        public TokenHelper(IOptions<TokenProviderOptions> tokenProviderOptionsAccessor)
-        {
-            _tokenProviderOptions = tokenProviderOptionsAccessor.Value;
-        }
-
-        #endregion
 
         #region Public Methods
 
-        public object GenerateToken(
-            string emailAddress, 
-            string firstName, 
-            string lastName,
-            UserType userType)
+        static public TokenDto GenerateToken(
+            User user,
+            TokenProviderOptions tokenProviderOptions)
         {
             var now = DateTime.UtcNow;
 
@@ -42,41 +29,75 @@ namespace Epc.API.Helpers
             // First and last names allow the UI to display the loggin in user (if they want) and roles are useful for authorization of other controllers
             var claims = new Claim[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, emailAddress),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.GivenName, firstName),
-                new Claim(JwtRegisteredClaimNames.FamilyName , lastName),
+                new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
+                new Claim(JwtRegisteredClaimNames.FamilyName , user.Surname),
                 new Claim(JwtRegisteredClaimNames.Iat, ((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds).ToString(), ClaimValueTypes.Integer64),
-                new Claim(ClaimTypes.Role, userType.Name),
-                new Claim("role", userType.Name) //This is useful for the react frontend that doesn't want to deal with the namespace
+                new Claim(ClaimTypes.Role, user.Type.Name),
+                new Claim("role", user.Type.Name) //This is useful for the react frontend that doesn't want to deal with the namespace
             };
+
+            var tokenExpiration = now.Add(tokenProviderOptions.Expiration);
 
             // Create the JWT and write it to a string
-            var jwt = new JwtSecurityToken(
+            var jwtSecurityToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: now,
-                expires: now.Add(_tokenProviderOptions.Expiration),
-                signingCredentials: _options.SigningCredentials);
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+                expires: tokenExpiration,
+                signingCredentials: GetSigningCredentials(tokenProviderOptions));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
-            var response = new
+            return new TokenDto()
             {
-                access_token = encodedJwt,
-                token_type,
-                expires_in = (int)_options.Expiration.TotalSeconds
+                AccessToken = accessToken,
+                ExpiresIn = ((Int32)tokenExpiration.Subtract(new DateTime(1970, 1, 1)).TotalSeconds),
             };
-            return tokenResponse
         }
 
+        static public JwtBearerOptions GetJwtBearerOptions(TokenProviderOptions tokenProviderOptions)
+        {
+            return new JwtBearerOptions
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                TokenValidationParameters = GetTokenValidationParameters(tokenProviderOptions)
+            };
+        }
 
         #endregion
 
 
         #region Private Methods
 
-        private void GetSigningCredentials()
+        static private SigningCredentials GetSigningCredentials(TokenProviderOptions tokenProviderOptions)
         {
+            return new SigningCredentials(
+                GetSymmetricSecurityKey(tokenProviderOptions.SecretKey),
+                tokenProviderOptions.Algorithm);
+        }
 
+        static private TokenValidationParameters GetTokenValidationParameters(TokenProviderOptions tokenProviderOptions)
+        {
+            return new TokenValidationParameters
+            {
+                // The signing key must match!
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = GetSymmetricSecurityKey(tokenProviderOptions.SecretKey),
+
+                // Validate the token expiry
+                ValidateLifetime = true,
+                ValidateAudience = false,
+                ValidateIssuer = false,
+
+                // If you want to allow a certain amount of clock drift, set that here:
+                ClockSkew = TimeSpan.Zero
+            };
+        }
+
+        static private SymmetricSecurityKey GetSymmetricSecurityKey(string secretKey)
+        {
+            return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
         }
 
         #endregion
