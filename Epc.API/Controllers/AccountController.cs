@@ -17,13 +17,12 @@ using Microsoft.AspNetCore.Authorization;
 namespace Epc.API.Controllers
 {
     [Route("api/v1/test")]
-    [Authorize]
     public class TestController : Controller
     {
         [HttpGet]
         public IActionResult Test()
         {
-            return Ok();
+            return Ok(new { state="success" });
         }
 
     }

@@ -57,6 +57,9 @@ namespace Epc.API
             //Entity framework Db Context
             ConfigureDbContext(services);
 
+            //Enable Cross-Origin Requests
+            services.AddCors();
+
             // register the repository
             services.AddScoped<IEpcRepository, EpcRepository>();
 
@@ -80,6 +83,16 @@ namespace Epc.API
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            if (env.IsDevelopment())
+            {
+                //TODO:Configure properly for PROD
+                app.UseCors(builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            }
 
             //Create test data
             epcContext.EnsureSeedDataForContext();

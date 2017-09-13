@@ -55,12 +55,12 @@ namespace Epc.API.Controllers
         {
             var user = _epcRepository.GetUserByEmailAddress(credentials.Username);
 
-            if (user.Password == PasswordHelper.HashPassword(credentials.Password))
+            if ((user != null) && (user.Password == PasswordHelper.HashPassword(credentials.Password)))
             {
                 return Ok(TokenHelper.GenerateToken(user, _tokenProviderOptions));
             }
 
-            return BadRequest();
+            return Forbid();
         }
 
     }
