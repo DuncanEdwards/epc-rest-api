@@ -2,8 +2,6 @@
 using Epc.API.Models;
 using Epc.API.Security;
 using Epc.API.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -33,13 +31,9 @@ namespace Epc.API.Controllers
 
         #endregion
 
-        public class AuthorForCreationDto
-        {
-            public string Email { get; set; }
-        }
+        #region Public Actions
 
-
-        [HttpPut("changepassword/{userId}")]
+        [HttpPut("ChangePassword/{userId}")]
         public IActionResult ChangePassword(
             Guid userId, 
             [FromBody] ChangePasswordDto changePasswordDto)
@@ -73,6 +67,8 @@ namespace Epc.API.Controllers
 
             return Forbid();
         }
+
+        #endregion
 
     }
 }
