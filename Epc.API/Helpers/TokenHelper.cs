@@ -29,7 +29,7 @@ namespace Epc.API.Helpers
             // First and last names allow the UI to display the loggin in user (if they want) and roles are useful for authorization of other controllers
             var claims = new Claim[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
                 new Claim(JwtRegisteredClaimNames.FamilyName , user.Surname),

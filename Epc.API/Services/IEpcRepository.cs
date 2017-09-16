@@ -8,7 +8,13 @@ namespace Epc.API.Services
 {
     public interface IEpcRepository
     {
+        User GetUser(Guid userId);
+
         User GetUserByEmailAddress(string email);
+
+        void UpdateUser(Guid userId);
+
+        bool Save();
 
     }
 }
