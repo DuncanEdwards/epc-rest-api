@@ -1,6 +1,6 @@
 ﻿using Epc.API.Helpers;
 using Epc.API.Models;
-using Epc.API.Security;
+using Epc.API.Options;
 using Epc.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -15,7 +15,9 @@ namespace Epc.API.Controllers
         #region Private Fields
 
         private readonly IEpcRepository _epcRepository;
-        private readonly TokenProviderOptions _tokenProviderOptions;
+        private readonly IEmailSender _emailSender;
+        private readonly TokenProviderSettings _tokenProviderOptions;
+        
 
         #endregion
 
@@ -23,9 +25,11 @@ namespace Epc.API.Controllers
 
         public AccountController(
             IEpcRepository epcRepository,
-            IOptions<TokenProviderOptions> tokenProviderOptions)
+            IEmailSender emailSender,
+            IOptions<TokenProviderSettings> tokenProviderOptions)
         {
             _epcRepository = epcRepository;
+            _emailSender = emailSender;
             _tokenProviderOptions = tokenProviderOptions.Value;
         }
 
@@ -98,6 +102,11 @@ namespace Epc.API.Controllers
             }
             user.RememberToken = Guid.NewGuid();
             _epcRepository.Save();
+            var task = _emailSender.SendEmailAsync(
+                @"dun_edwards@yahoo.com",
+                "Helloses",
+                "Helloses body");
+            task.Wait();
             return Ok();
         }
 

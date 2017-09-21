@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Epc.API.Entities;
 using Epc.API.Services;
-using Epc.API.Security;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Text;
 using Epc.API.Helpers;
+using Epc.API.Options;
 
 namespace Epc.API
 {
@@ -62,12 +57,16 @@ namespace Epc.API
 
             // register the repository
             services.AddScoped<IEpcRepository, EpcRepository>();
+            // register the emailer
+            services.AddScoped<IEmailSender, MailgunEmailSender>();
 
             //Required to use options
             services.AddOptions();
 
-            //Token provider options
-            services.Configure<TokenProviderOptions>(Configuration.GetSection("TokenProvider"));
+            //Token provider settings
+            services.Configure<TokenProviderSettings>(Configuration.GetSection("TokenProvider"));
+            //Email settings
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
 
             // Add framework services.
             services.AddMvc();
@@ -79,7 +78,7 @@ namespace Epc.API
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
             EpcContext epcContext,
-            IOptions<TokenProviderOptions> tokenProviderOptions)
+            IOptions<TokenProviderSettings> tokenProviderOptions)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();

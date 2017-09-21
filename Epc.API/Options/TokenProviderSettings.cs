@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
 
-namespace Epc.API.Security
+namespace Epc.API.Options
 {
-    public class TokenProviderOptions
+    public class TokenProviderSettings
     {
         public TimeSpan Expiration { get; set; } = TimeSpan.FromDays(1);
 

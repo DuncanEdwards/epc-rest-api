@@ -1,16 +1,12 @@
 ﻿using Epc.API.Entities;
 using Epc.API.Models;
-using Epc.API.Security;
+using Epc.API.Options;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Epc.API.Helpers
 {
@@ -21,7 +17,7 @@ namespace Epc.API.Helpers
 
         static public TokenDto GenerateToken(
             User user,
-            TokenProviderOptions tokenProviderOptions)
+            TokenProviderSettings tokenProviderOptions)
         {
             var now = DateTime.UtcNow;
 
@@ -55,7 +51,7 @@ namespace Epc.API.Helpers
             };
         }
 
-        static public JwtBearerOptions GetJwtBearerOptions(TokenProviderOptions tokenProviderOptions)
+        static public JwtBearerOptions GetJwtBearerOptions(TokenProviderSettings tokenProviderOptions)
         {
             return new JwtBearerOptions
             {
@@ -70,14 +66,14 @@ namespace Epc.API.Helpers
 
         #region Private Methods
 
-        static private SigningCredentials GetSigningCredentials(TokenProviderOptions tokenProviderOptions)
+        static private SigningCredentials GetSigningCredentials(TokenProviderSettings tokenProviderOptions)
         {
             return new SigningCredentials(
                 GetSymmetricSecurityKey(tokenProviderOptions.SecretKey),
                 tokenProviderOptions.Algorithm);
         }
 
-        static private TokenValidationParameters GetTokenValidationParameters(TokenProviderOptions tokenProviderOptions)
+        static private TokenValidationParameters GetTokenValidationParameters(TokenProviderSettings tokenProviderOptions)
         {
             return new TokenValidationParameters
             {
