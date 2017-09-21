@@ -33,11 +33,16 @@ namespace Epc.API.Controllers
 
         #region Public Actions
 
-        [HttpPut("ChangePassword/{userId}")]
+        [HttpPut("{userId}/ChangePassword")]
         public IActionResult ChangePassword(
             Guid userId, 
             [FromBody] ChangePasswordDto changePasswordDto)
         {
+            if (!ModelState.IsValid)
+            {
+                //return 422
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
 
             var user = _epcRepository.GetUser(userId);
 
@@ -54,6 +59,49 @@ namespace Epc.API.Controllers
             }
             return Forbid();
         }
+
+        [HttpPut("ResetPassword")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                //return 422
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            var user = _epcRepository.GetUserByRememberToken(resetPasswordDto.RememberToken);
+
+            if (user == null)
+            {
+                return Forbid();
+            }
+
+            user.Password = PasswordHelper.HashPassword(resetPasswordDto.Password);
+            _epcRepository.Save();
+            return NoContent();
+        }
+
+        [HttpPost("SendResetLink")]
+        public IActionResult SendResetLink([FromBody] SendResetLinkDto sendResetLinkDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                //return 422
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            var user = _epcRepository.GetUserByEmailAddress(sendResetLinkDto.Email);
+
+            if (user == null)
+            {
+                return Forbid();
+            }
+            user.RememberToken = Guid.NewGuid();
+            _epcRepository.Save();
+            return Ok();
+        }
+
+
 
         [HttpPost("Token")]
         public IActionResult Token([FromBody] CredentialsDto credentials)

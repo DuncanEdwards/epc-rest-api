@@ -36,6 +36,11 @@ namespace Epc.API.Services
            return  _epcContext.Users.Include("Type").FirstOrDefault(u => (u.Email == email));
         }
 
+        public User GetUserByRememberToken(Guid rememberToken)
+        {
+            return _epcContext.Users.Include("Type").FirstOrDefault(u => (u.RememberToken == rememberToken));
+        }
+
         public bool Save()
         {
             return (_epcContext.SaveChanges() >= 0);

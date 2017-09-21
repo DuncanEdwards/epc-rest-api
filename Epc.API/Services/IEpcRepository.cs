@@ -12,6 +12,8 @@ namespace Epc.API.Services
 
         User GetUserByEmailAddress(string email);
 
+        User GetUserByRememberToken(Guid rememberToken);
+
         void UpdateUser(Guid userId);
 
         bool Save();

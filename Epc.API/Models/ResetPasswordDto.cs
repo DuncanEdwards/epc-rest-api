@@ -1,15 +1,16 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Epc.API.Models
 {
-    public class ChangePasswordDto
+    public class ResetPasswordDto
     {
         [Required]
-        public string OldPassword { get; set; }
+        public Guid RememberToken { get; set; }
 
         [Required]
-        public string NewPassword { get; set; }
+        public string Password { get; set; }
 
     }
 }
