@@ -8,5 +8,10 @@ namespace Epc.API.Models
         [Required]
         public string Email { get; set; }
 
+        [Required]
+        public string ResetLink { get; set; }
+
+        public bool IsNewUser = false;
+
     }
 }

@@ -40,7 +40,7 @@ namespace Epc.API.Services
                     new KeyValuePair<string, string>("from", _emailSettings.From),
                     new KeyValuePair<string, string>("to", email),
                     new KeyValuePair<string, string>("subject", subject),
-                    new KeyValuePair<string, string>("text", message)
+                    new KeyValuePair<string, string>("html", message)
                 });
 
                 await client.PostAsync(_emailSettings.RequestUri, content).ConfigureAwait(false);

@@ -102,11 +102,17 @@ namespace Epc.API.Controllers
             }
             user.RememberToken = Guid.NewGuid();
             _epcRepository.Save();
+
+            //TODO: Split out link creation into private message and inc remember tokn
+
+            var htmlMessage = sendResetLinkDto.IsNewUser ?
+                "You have been added as a " + user.Type.Name + " of the EPC administration dashboard.<br> To enter a password please click <a href='" + sendResetLinkDto.ResetLink + "?IsReset=false'>here</a>." :
+                "To reset your password, please click <a href='" + sendResetLinkDto.ResetLink + "?IsReset=false'>here</a>.";
+
             var task = _emailSender.SendEmailAsync(
                 @"dun_edwards@yahoo.com",
-                "Helloses",
-                "Helloses body");
-            task.Wait();
+                (sendResetLinkDto.IsNewUser?"Enter a password to activate your account":"Reset your password"),
+                htmlMessage);
             return Ok();
         }
 
