@@ -43,8 +43,6 @@ namespace Epc.API.Services
                     new KeyValuePair<string, string>("text", message)
                 });
 
-                var test = await client.PostAsync(_emailSettings.RequestUri, content);
-
                 await client.PostAsync(_emailSettings.RequestUri, content).ConfigureAwait(false);
             }
         }
