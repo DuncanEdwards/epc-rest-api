@@ -5,6 +5,7 @@ using Epc.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
+using System.Net;
 
 namespace Epc.API.Controllers
 {
@@ -106,17 +107,24 @@ namespace Epc.API.Controllers
             //TODO: Split out link creation into private message and inc remember tokn
 
             var htmlMessage = sendResetLinkDto.IsNewUser ?
-                "You have been added as a " + user.Type.Name + " of the EPC administration dashboard.<br> To enter a password please click <a href='" + sendResetLinkDto.ResetLink + "?IsReset=false'>here</a>." :
-                "To reset your password, please click <a href='" + sendResetLinkDto.ResetLink + "?IsReset=false'>here</a>.";
+                $"You have been added to the EPC administration dashboard.<br> To enter a password please click <a href='{GetResetLink(sendResetLinkDto, user.RememberToken.Value)}'>here</a>." :
+                $"To reset your password, please click <a href='{GetResetLink(sendResetLinkDto, user.RememberToken.Value)}'>here</a>.";
 
             var task = _emailSender.SendEmailAsync(
-                @"dun_edwards@yahoo.com",
+                sendResetLinkDto.Email,
                 (sendResetLinkDto.IsNewUser?"Enter a password to activate your account":"Reset your password"),
                 htmlMessage);
             return Ok();
         }
 
-
+        private string GetResetLink(
+            SendResetLinkDto sendResetLinkDto,
+            Guid rememberToken)
+        {
+            return sendResetLinkDto.ResetLink + 
+                "?IsReset=" + (!sendResetLinkDto.IsNewUser) + 
+                "&RememberToken=" + WebUtility.UrlEncode(rememberToken.ToString());
+        }
 
         [HttpPost("Token")]
         public IActionResult Token([FromBody] CredentialsDto credentials)
