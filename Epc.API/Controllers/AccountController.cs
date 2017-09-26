@@ -82,6 +82,9 @@ namespace Epc.API.Controllers
             }
 
             user.Password = PasswordHelper.HashPassword(resetPasswordDto.Password);
+            user.IsDeleted = false;
+            //Remove remember token so password can't be reset
+            //TODO:Reinstate user.RememberToken = null;
             _epcRepository.Save();
             return NoContent();
         }
@@ -122,7 +125,7 @@ namespace Epc.API.Controllers
             Guid rememberToken)
         {
             return sendResetLinkDto.ResetLink + 
-                "?IsReset=" + (!sendResetLinkDto.IsNewUser) + 
+                "?IsNewUser=" + (sendResetLinkDto.IsNewUser) + 
                 "&RememberToken=" + WebUtility.UrlEncode(rememberToken.ToString());
         }
 
