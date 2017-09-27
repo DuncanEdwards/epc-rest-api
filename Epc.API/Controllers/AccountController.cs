@@ -126,6 +126,7 @@ namespace Epc.API.Controllers
         {
             return sendResetLinkDto.ResetLink + 
                 "?IsNewUser=" + (sendResetLinkDto.IsNewUser) + 
+                "&email=" + WebUtility.UrlEncode(sendResetLinkDto.Email) +
                 "&RememberToken=" + WebUtility.UrlEncode(rememberToken.ToString());
         }
 
