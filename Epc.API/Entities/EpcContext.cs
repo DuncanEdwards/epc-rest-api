@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Epc.API.Entities
     {
 
         #region Public Properties
+
+        public DbSet<EpcType> EpcTypes { get; set; }
 
         public DbSet<User> Users { get; set; }
 
@@ -28,6 +31,7 @@ namespace Epc.API.Entities
         {
             Database.Migrate();
         }
+        public EpcContext() {}
 
         #endregion
 
@@ -38,6 +42,12 @@ namespace Epc.API.Entities
             modelBuilder.Entity<User>()
             .HasIndex(user => user.Email )
             .IsUnique(true);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //var connectionString = Configuration["connectionStrings:epcDBConnectionString"];
+            optionsBuilder.UseSqlServer("Server = (localdb)\\mssqllocaldb; Database = Epc; Trusted_Connection = True");
         }
 
         #endregion

@@ -52,7 +52,7 @@ namespace Epc.API
             IServiceCollection services)
         {
             //Entity framework Db Context
-            ConfigureDbContext(services);
+            //ConfigureDbContext(services);
 
             //Enable Cross-Origin Requests
             services.AddCors();

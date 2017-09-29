@@ -2,6 +2,7 @@
 using Epc.API.Models;
 using Epc.API.Options;
 using Epc.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -39,6 +40,7 @@ namespace Epc.API.Controllers
         #region Public Actions
 
         [HttpPut("{userId}/ChangePassword")]
+        [Authorize]
         public IActionResult ChangePassword(
             Guid userId, 
             [FromBody] ChangePasswordDto changePasswordDto)
@@ -59,6 +61,7 @@ namespace Epc.API.Controllers
             if (user.Password == PasswordHelper.HashPassword(changePasswordDto.OldPassword))
             {
                 user.Password = PasswordHelper.HashPassword(changePasswordDto.NewPassword);
+                user.UpdatedAt = DateTime.Now;
                 _epcRepository.Save();
                 return NoContent();
             }
@@ -82,9 +85,9 @@ namespace Epc.API.Controllers
             }
 
             user.Password = PasswordHelper.HashPassword(resetPasswordDto.Password);
-            user.IsDeleted = false;
+            user.UpdatedAt = DateTime.Now;
             //Remove remember token so password can't be reset
-            //TODO:Reinstate user.RememberToken = null;
+            user.RememberToken = null;
             _epcRepository.Save();
             return NoContent();
         }
@@ -105,6 +108,7 @@ namespace Epc.API.Controllers
                 return Forbid();
             }
             user.RememberToken = Guid.NewGuid();
+            user.UpdatedAt = DateTime.Now;
             _epcRepository.Save();
 
             //TODO: Split out link creation into private message and inc remember tokn
