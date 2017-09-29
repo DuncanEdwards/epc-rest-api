@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using Epc.API.Helpers;
 using Epc.API.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Epc.API
 {
@@ -47,7 +48,8 @@ namespace Epc.API
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(
+            IServiceCollection services)
         {
             //Entity framework Db Context
             ConfigureDbContext(services);
@@ -68,6 +70,16 @@ namespace Epc.API
             //Email settings
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
 
+            //Get token provider options for token validation config
+            var serviceProvider = services.BuildServiceProvider();
+            var tokenProviderOptions = serviceProvider.GetService<IOptions<TokenProviderSettings>>();
+
+            //Hook in Jwt Bearer authorization service
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = TokenHelper.GetTokenValidationParameters(tokenProviderOptions.Value);
+            });
+
             // Add framework services.
             services.AddMvc();
         }
@@ -77,8 +89,7 @@ namespace Epc.API
             IApplicationBuilder app, 
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
-            EpcContext epcContext,
-            IOptions<TokenProviderSettings> tokenProviderOptions)
+            EpcContext epcContext)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -96,9 +107,7 @@ namespace Epc.API
             //Create test data
             epcContext.EnsureSeedDataForContext();
 
-            //Hook in Jwt Bearer authorization
-            app.UseJwtBearerAuthentication(TokenHelper.GetJwtBearerOptions(tokenProviderOptions.Value));
-
+            app.UseAuthentication();
 
             app.UseMvc();
         }

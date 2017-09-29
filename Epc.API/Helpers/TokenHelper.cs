@@ -1,6 +1,7 @@
 ﻿using Epc.API.Entities;
 using Epc.API.Models;
 using Epc.API.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -51,29 +52,7 @@ namespace Epc.API.Helpers
             };
         }
 
-        static public JwtBearerOptions GetJwtBearerOptions(TokenProviderSettings tokenProviderOptions)
-        {
-            return new JwtBearerOptions
-            {
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                TokenValidationParameters = GetTokenValidationParameters(tokenProviderOptions)
-            };
-        }
-
-        #endregion
-
-
-        #region Private Methods
-
-        static private SigningCredentials GetSigningCredentials(TokenProviderSettings tokenProviderOptions)
-        {
-            return new SigningCredentials(
-                GetSymmetricSecurityKey(tokenProviderOptions.SecretKey),
-                tokenProviderOptions.Algorithm);
-        }
-
-        static private TokenValidationParameters GetTokenValidationParameters(TokenProviderSettings tokenProviderOptions)
+        static public TokenValidationParameters GetTokenValidationParameters(TokenProviderSettings tokenProviderOptions)
         {
             return new TokenValidationParameters
             {
@@ -89,6 +68,18 @@ namespace Epc.API.Helpers
                 // If you want to allow a certain amount of clock drift, set that here:
                 ClockSkew = TimeSpan.Zero
             };
+        }
+
+        #endregion
+
+
+        #region Private Methods
+
+        static private SigningCredentials GetSigningCredentials(TokenProviderSettings tokenProviderOptions)
+        {
+            return new SigningCredentials(
+                GetSymmetricSecurityKey(tokenProviderOptions.SecretKey),
+                tokenProviderOptions.Algorithm);
         }
 
         static private SymmetricSecurityKey GetSymmetricSecurityKey(string secretKey)
