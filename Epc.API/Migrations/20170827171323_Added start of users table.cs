@@ -20,7 +20,7 @@ namespace Epc.API.Migrations
                     Password = table.Column<string>(maxLength: 100, nullable: true),
                     RememberToken = table.Column<Guid>(maxLength: 100, nullable: false),
                     Surname = table.Column<string>(maxLength: 300, nullable: false),
-                    TypeId = table.Column<Guid>(nullable: false),
+                    TypeId = table.Column<Guid>(type: "char(36)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,15 @@ namespace Epc.API.Entities
     public class EpcContext : DbContext
     {
 
+        #region Private Fields
+
+        private readonly IConfiguration _configuration;
+
+        #endregion
+
         #region Public Properties
 
-        public DbSet<EpcType> EpcTypes { get; set; }
+        //public DbSet<EpcType> EpcTypes { get; set; }
 
         public DbSet<User> Users { get; set; }
 
@@ -26,9 +33,12 @@ namespace Epc.API.Entities
         /// Initializes a new instance of the <see cref="EpcContext"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
-        public EpcContext(DbContextOptions<EpcContext> options) 
+        public EpcContext(
+            DbContextOptions<EpcContext> options,
+            IConfiguration configuration) 
             : base(options)
         {
+            _configuration = configuration; 
             Database.Migrate();
         }
         public EpcContext() {}
@@ -46,8 +56,7 @@ namespace Epc.API.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //var connectionString = Configuration["connectionStrings:epcDBConnectionString"];
-            optionsBuilder.UseSqlServer("Server = (localdb)\\mssqllocaldb; Database = Epc; Trusted_Connection = True");
+            optionsBuilder.UseMySql(_configuration.GetValue<string>("connectionStrings:epcDBConnectionString"));
         }
 
         #endregion

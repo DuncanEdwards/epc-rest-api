@@ -13,6 +13,9 @@ namespace Epc.API.Entities
         [Required]
         public DateTime JobDate { get; set; }
 
+        [Required]
+        public EpcType Type { get; set; }
+
 
     }
 }

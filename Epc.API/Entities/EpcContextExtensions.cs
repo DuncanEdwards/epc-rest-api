@@ -1,10 +1,9 @@
-﻿using Epc.API.Helpers;
+﻿using Csv;
+using Epc.API.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Epc.API.Entities
 {
@@ -15,6 +14,9 @@ namespace Epc.API.Entities
 
         private static void CreateTestUsersIfNecessary(EpcContext context)
         {
+
+            Random random = new System.Random();
+
             if (context.Users.Any())
             {
                 return;
@@ -34,47 +36,28 @@ namespace Epc.API.Entities
                     UpdatedAt = DateTime.Now,
                     CreatedAt = DateTime.Now,
                     IsDeleted = false
-                },
-                new User()
-                {
-                    Id = new Guid("5f8b723d-1013-4bd1-bffa-4a120cdd7df2"),
-                    Type = context.UserTypes.First(userType => userType.Code == "AGENT"),
-                    FirstName = "Bart",
-                    Surname = "Simpson",
-                    Email = "bart_simpson@yahoo.com",
-                    Password = PasswordHelper.HashPassword("damnedifyoudo"),
-                    RememberToken = null,
-                    UpdatedAt = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    IsDeleted = false
-                },
-                new User()
-                {
-                    Id = new Guid("0875ec38-f812-43c3-a7ed-0336cd940162"),
-                    Type = context.UserTypes.First(userType => userType.Code == "AGENT"),
-                    FirstName = "Lisa",
-                    Surname = "Simpson",
-                    Email = "lisa_simpson@yahoo.com",
-                    Password = PasswordHelper.HashPassword("iloveschool"),
-                    RememberToken = null,
-                    UpdatedAt = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    IsDeleted = false
-                },
-                 new User()
-                {
-                    Id = new Guid("05cd4786-634a-41f3-87e4-af52817a2b3f"),
-                    Type = context.UserTypes.First(userType => userType.Code == "AGENT"),
-                    FirstName = "Marge",
-                    Surname = "Simpson",
-                    Email = "marge_simpson@yahoo.com",
-                    Password = PasswordHelper.HashPassword("bluehair"),
-                    RememberToken = null,
-                    UpdatedAt = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    IsDeleted = false
                 }
             };
+
+            var usersFromCsv = CsvReader.ReadFromText(File.ReadAllText(@"Data Scripts/Users.csv"));
+            foreach (var userFromCsv in usersFromCsv)
+            { 
+                var randomAgentCode = ((random.Next(0, 2) == 0) ? "AGENT" : "ASSESSOR");
+                var user = new User()
+                {
+                    Id = new Guid(userFromCsv["id"]),
+                    Type = context.UserTypes.FirstOrDefault(userType => userType.Code == randomAgentCode),
+                    FirstName = userFromCsv["first_name"],
+                    Surname = userFromCsv["last_name"],
+                    Email = userFromCsv["email"],
+                    Password = PasswordHelper.HashPassword(userFromCsv["password"]),
+                    RememberToken = null,
+                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    IsDeleted = false
+                };
+                users.Add(user);
+            }
 
             context.Users.AddRange(users);
             context.SaveChanges();
@@ -111,6 +94,7 @@ namespace Epc.API.Entities
                 }
             };
             context.UserTypes.AddRange(userTypes);
+            context.SaveChanges();
         }
 
 

@@ -19,33 +19,15 @@ namespace Epc.API
     /// </summary>
     public class Startup
     {
-        #region Private Methods
-
-        /// <summary>
-        /// Configures the database context to SQL Server EPC Database
-        /// </summary>
-        private void ConfigureDbContext(IServiceCollection services)
-        {
-            // it's better to store the connection string in an environment variable)
-            var connectionString = Configuration["connectionStrings:epcDBConnectionString"];
-            services.AddDbContext<EpcContext>(o => o.UseSqlServer(connectionString));
-        }
-
-        #endregion
 
         #region Public Methods
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(
@@ -61,6 +43,8 @@ namespace Epc.API
             services.AddScoped<IEpcRepository, EpcRepository>();
             // register the emailer
             services.AddScoped<IEmailSender, MailgunEmailSender>();
+            // Register the DB context
+            services.AddDbContext<EpcContext>();
 
             //Required to use options
             services.AddOptions();
@@ -103,6 +87,13 @@ namespace Epc.API
                     .AllowAnyHeader()
                     .AllowCredentials());
             }
+
+            AutoMapper.Mapper.Initialize(config =>
+            {
+                config.CreateMap<User, Models.UserDto>().ForMember(
+                       dest => dest.UserTypeId,
+                       opt => opt.MapFrom(src => src.Type.Id));
+            });
 
             //Create test data
             epcContext.EnsureSeedDataForContext();

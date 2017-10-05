@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Epc.API.Entities
 {
@@ -7,7 +8,7 @@ namespace Epc.API.Entities
     {
 
         [Key]
-        public Guid Id { get; set; }
+        public String Id { get; set; }
 
         [Required]
         [MaxLength(20)]

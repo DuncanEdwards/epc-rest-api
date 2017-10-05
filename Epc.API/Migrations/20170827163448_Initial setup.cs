@@ -12,7 +12,7 @@ namespace Epc.API.Migrations
                 name: "UserTypes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Code = table.Column<string>(maxLength: 20, nullable: false),
                     Name = table.Column<string>(maxLength: 100, nullable: false)
                 },
