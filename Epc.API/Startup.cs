@@ -11,6 +11,9 @@ using System.Text;
 using Epc.API.Helpers;
 using Epc.API.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Epc.API
 {
@@ -33,18 +36,24 @@ namespace Epc.API
         public void ConfigureServices(
             IServiceCollection services)
         {
-            //Entity framework Db Context
-            //ConfigureDbContext(services);
-
             //Enable Cross-Origin Requests
             services.AddCors();
 
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            //Add Url Helper
+            services.AddScoped<IUrlHelper, UrlHelper>(implementationFactory =>
+            {
+                var actionContext = implementationFactory.GetService<IActionContextAccessor>().ActionContext;
+                return new UrlHelper(actionContext);
+            });
             // register the repository
             services.AddScoped<IEpcRepository, EpcRepository>();
             // register the emailer
             services.AddScoped<IEmailSender, MailgunEmailSender>();
             // Register the DB context
             services.AddDbContext<EpcContext>();
+
 
             //Required to use options
             services.AddOptions();
@@ -53,6 +62,7 @@ namespace Epc.API
             services.Configure<TokenProviderSettings>(Configuration.GetSection("TokenProvider"));
             //Email settings
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+
 
             //Get token provider options for token validation config
             var serviceProvider = services.BuildServiceProvider();

@@ -13,3 +13,5 @@
 /Epc.API.Test/obj/Debug/netcoreapp2.0
 /Epc.API.Test/obj
 
+/Epc.API/bin/Release/PublishOutput
+/Epc.API/bin/Release/netcoreapp2.0

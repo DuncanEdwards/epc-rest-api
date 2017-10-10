@@ -51,7 +51,7 @@ namespace Epc.API.Helpers.Paging
 
         #region Public Methods
 
-        public string GetPaginationHeaderJson()
+        public string GetPaginationHeaderJson(string previousPageUri, string nextPageUri)
         {
             var paginationMetadata = new
             {
@@ -59,6 +59,8 @@ namespace Epc.API.Helpers.Paging
                 pageSize = PageSize,
                 currentPage = CurrentPage,
                 totalPages = TotalPages,
+                previousPage = (HasPrevious) ? previousPageUri : null,
+                nextPage = (HasNext) ? nextPageUri : null,
             };
 
             return JsonConvert.SerializeObject(paginationMetadata);
