@@ -11,9 +11,10 @@ using System;
 namespace Epc.API.Migrations
 {
     [DbContext(typeof(EpcContext))]
-    partial class EpcContextModelSnapshot : ModelSnapshot
+    [Migration("20171016145828_Added an IsActivated column")]
+    partial class AddedanIsActivatedcolumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

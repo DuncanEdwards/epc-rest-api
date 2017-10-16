@@ -13,7 +13,7 @@ namespace Epc.API.Helpers.Paging
        
         public UsersResourceParameters()
         {
-            ValidOrderByFields.AddRange(new[] { "Surname", "Firstname", "Email" });
+            ValidOrderByFields.AddRange(new[] { "Surname", "FirstName", "Email" });
             //Set default
             OrderBy = "Surname";
         }

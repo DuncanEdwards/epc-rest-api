@@ -54,7 +54,8 @@ namespace Epc.API.Entities
                     RememberToken = null,
                     UpdatedAt = DateTime.Now,
                     CreatedAt = DateTime.Now,
-                    IsDeleted = false
+                    IsDeleted = false,
+                    IsActivated = true
                 };
                 users.Add(user);
             }

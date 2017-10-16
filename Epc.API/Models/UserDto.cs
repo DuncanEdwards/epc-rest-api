@@ -9,7 +9,7 @@ namespace Epc.API.Models
     {
         public Guid Id { get; set; }
 
-        public Guid UserTypeId { get; set; }
+        public string Type { get; set; }
 
         public string FirstName { get; set; }
 

@@ -37,7 +37,10 @@ namespace Epc.API.Entities
         public DateTime CreatedAt { get; set; }
 
         [Required]
-        public bool IsDeleted { get; set; }
+        public bool IsActivated { get; set; } = true;
+
+        [Required]
+        public bool IsDeleted { get; set; } = true;
 
         #endregion
 

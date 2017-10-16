@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Epc.API.Middleware;
 
 namespace Epc.API
 {
@@ -90,7 +91,15 @@ namespace Epc.API
 
             if (env.IsDevelopment())
             {
-                //TODO:Configure properly for PROD
+                app.UseCors(builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            } else
+            {
+                //TODO:Configure properly for PROD, lets maybe not just turn everything off! 
+                // Probably make it configurable in case React JS URL changes over time
                 app.UseCors(builder => builder
                     .AllowAnyOrigin()
                     .AllowAnyMethod()
@@ -98,15 +107,19 @@ namespace Epc.API
                     .AllowCredentials());
             }
 
+
             AutoMapper.Mapper.Initialize(config =>
             {
                 config.CreateMap<User, Models.UserDto>().ForMember(
-                       dest => dest.UserTypeId,
-                       opt => opt.MapFrom(src => src.Type.Id));
+                       dest => dest.Type,
+                       opt => opt.MapFrom(src => src.Type.Name));
             });
 
             //Create test data
             epcContext.EnsureSeedDataForContext();
+
+            //Add custom response header so pagination is returned to browser
+            app.UseAddCustomResponseHeaders();
 
             app.UseAuthentication();
 
